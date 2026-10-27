@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>人生倒數｜一週一格，看清剩下的日子 — 存點日子</title>
+  <meta name="description" content="輸入生日，用一週一格看見人生進度。還能過幾次農曆新年？看幾次櫻花？陪家人吃幾次年夜飯？溫柔的倒數，提醒你珍惜現在。" />
+  <meta name="theme-color" content="#c4a484" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content="人生倒數｜一週一格，看清剩下的日子" />
+  <meta property="og:description" content="輸入生日，用一週一格看見人生進度。還能過幾次農曆新年、看幾次櫻花、陪家人吃幾次年夜飯？" />
+  <meta property="og:locale" content="zh_TW" />
+  <meta property="og:site_name" content="存點日子" />
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content="人生倒數｜一週一格，看清剩下的日子" />
+  <meta name="twitter:description" content="輸入生日，用一週一格看見人生進度。溫柔的倒數，提醒你珍惜現在。" />
+  <link rel="icon" href="favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="favicon.svg" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <a class="skip" href="#main">跳到內容</a>
+  <header class="top">
+    <div class="brand">
+      <span class="brand-mark" aria-hidden="true"></span>
+      <span class="brand-name">存點日子</span>
+    </div>
+    <button type="button" id="themeToggle" class="icon-btn" aria-label="切換深淺色模式" title="切換深淺色">
+      <span class="theme-icon" aria-hidden="true"></span>
+    </button>
+  </header>
+
+  <main id="main">
+    <section class="hero">
+      <p class="eyebrow">人生一週一格</p>
+      <h1>人生倒數</h1>
+      <p class="lede">把人生鋪成格子。每一格是一週——已走過的、正在過的、還剩下的。</p>
+    </section>
+
+    <section class="panel setup" aria-labelledby="setup-title">
+      <h2 id="setup-title" class="sr-only">設定</h2>
+      <label class="field">
+        <span class="label">你的生日</span>
+        <input type="date" id="birthday" max="" required />
+      </label>
+      <label class="field slider-field">
+        <span class="label">假設壽命 <strong id="expectLabel">80</strong> 歲</span>
+        <input type="range" id="expectancy" min="70" max="90" value="80" step="1" />
+        <span class="hint">可調整 70–90 歲。台灣近年平均壽命約八十多歲，個人差異很大，此處僅作視覺參考。</span>
+      </label>
+    </section>
+
+    <section class="panel stats" id="statsPanel" hidden>
+      <div class="stat-row">
+        <div class="stat">
+          <span class="stat-num" id="livedWeeks">0</span>
+          <span class="stat-label">已活過（週）</span>
+        </div>
+        <div class="stat">
+          <span class="stat-num" id="remainWeeks">0</span>
+          <span class="stat-label">還剩約（週）</span>
+        </div>
+        <div class="stat highlight">
+          <span class="stat-num" id="lifePct">0%</span>
+          <span class="stat-label">人生進度</span>
+        </div>
+      </div>
+      <p class="age-line" id="ageLine"></p>
+    </section>
+
+    <section class="panel grid-wrap" id="gridPanel" hidden aria-labelledby="grid-title">
+      <div class="grid-head">
+        <h2 id="grid-title">人生週曆</h2>
+        <div class="legend">
+          <span><i class="dot lived"></i>已過</span>
+          <span><i class="dot now"></i>本週</span>
+          <span><i class="dot remain"></i>未來</span>
+        </div>
+      </div>
+      <div class="grid-scroll">
+        <div id="weekGrid" class="week-grid" role="img" aria-label="人生週格圖"></div>
+      </div>
+      <p class="grid-foot">每列約一年 · 由左至右 · 由上而下</p>
+    </section>
+
+    <section class="panel remains" id="remainsPanel" hidden aria-labelledby="remains-title">
+      <h2 id="remains-title">還能……</h2>
+      <p class="remains-intro">若以你設定的壽命粗估，大約還有：</p>
+      <div class="cards" id="remainCards"></div>
+
+      <div class="custom-card">
+        <label class="custom-label" for="customLabel">自訂一句</label>
+        <div class="custom-row">
+          <span class="custom-prefix">還能</span>
+          <input type="text" id="customLabel" maxlength="24" placeholder="陪爸媽吃幾次年夜飯" />
+          <span class="custom-mid">約</span>
+          <strong id="customCount">—</strong>
+          <span class="custom-suffix">次</span>
+        </div>
+        <p class="hint">預設每年一次。數字會隨剩餘年數自動更新，只存在你的瀏覽器。</p>
+      </div>
+    </section>
+
+    <section class="panel share-panel" id="sharePanel" hidden>
+      <button type="button" id="shareBtn" class="primary-btn">產生分享圖</button>
+      <p class="hint center">1080×1350，適合貼 IG／Threads。圖檔只在你裝置產生，不會上傳。</p>
+      <div id="sharePreview" class="share-preview" hidden>
+        <img id="shareImg" alt="分享圖預覽" />
+        <a id="shareDownload" class="secondary-btn" download="人生倒數.png">下載圖片</a>
+      </div>
+    </section>
+
+    <footer class="foot">
+      <p>資料只存在本機瀏覽器 · 無追蹤 · 無帳號</p>
+      <p class="foot-brand">存點日子</p>
+    </footer>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
