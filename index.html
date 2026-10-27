@@ -4,16 +4,16 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>人生倒數｜一週一格，看清剩下的日子 — 存點日子</title>
-  <meta name="description" content="輸入生日，用一週一格看見人生進度。還能過幾次農曆新年？看幾次櫻花？陪家人吃幾次年夜飯？溫柔的倒數，提醒你珍惜現在。" />
+  <meta name="description" content="輸入生日，用年、月、週、日看見人生進度。標記里程碑與目標，溫柔的倒數提醒你珍惜現在。" />
   <meta name="theme-color" content="#c4a484" />
   <meta property="og:type" content="website" />
   <meta property="og:title" content="人生倒數｜一週一格，看清剩下的日子" />
-  <meta property="og:description" content="輸入生日，用一週一格看見人生進度。還能過幾次農曆新年、看幾次櫻花、陪家人吃幾次年夜飯？" />
+  <meta property="og:description" content="輸入生日，用年、月、週、日看見人生進度。還能過幾次農曆新年、看幾次櫻花？" />
   <meta property="og:locale" content="zh_TW" />
   <meta property="og:site_name" content="存點日子" />
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content="人生倒數｜一週一格，看清剩下的日子" />
-  <meta name="twitter:description" content="輸入生日，用一週一格看見人生進度。溫柔的倒數，提醒你珍惜現在。" />
+  <meta name="twitter:description" content="輸入生日，用年、月、週、日看見人生進度。溫柔的倒數，提醒你珍惜現在。" />
   <link rel="icon" href="favicon.svg" type="image/svg+xml" />
   <link rel="apple-touch-icon" href="favicon.svg" />
   <link rel="stylesheet" href="styles.css" />
@@ -25,16 +25,21 @@
       <span class="brand-mark" aria-hidden="true"></span>
       <span class="brand-name">存點日子</span>
     </div>
-    <button type="button" id="themeToggle" class="icon-btn" aria-label="切換深淺色模式" title="切換深淺色">
-      <span class="theme-icon" aria-hidden="true"></span>
-    </button>
+    <div class="top-actions">
+      <button type="button" id="dataBtn" class="icon-btn" aria-label="匯出或匯入資料" title="備份資料">
+        <span class="data-icon" aria-hidden="true">⇅</span>
+      </button>
+      <button type="button" id="themeToggle" class="icon-btn" aria-label="切換深淺色模式" title="切換深淺色">
+        <span class="theme-icon" aria-hidden="true"></span>
+      </button>
+    </div>
   </header>
 
   <main id="main">
     <section class="hero">
-      <p class="eyebrow">人生一週一格</p>
+      <p class="eyebrow">人生一格一格看</p>
       <h1>人生倒數</h1>
-      <p class="lede">把人生鋪成格子。每一格是一週——已走過的、正在過的、還剩下的。</p>
+      <p class="lede">把人生鋪成格子——以年、月、週或日。標記里程碑與目標，看清已走過的、正在過的、還剩下的。</p>
     </section>
 
     <section class="panel setup" aria-labelledby="setup-title">
@@ -48,17 +53,18 @@
         <input type="range" id="expectancy" min="70" max="90" value="80" step="1" />
         <span class="hint">可調整 70–90 歲。台灣近年平均壽命約八十多歲，個人差異很大，此處僅作視覺參考。</span>
       </label>
+      <p class="bday-reminder" id="bdayReminder" hidden></p>
     </section>
 
     <section class="panel stats" id="statsPanel" hidden>
-      <div class="stat-row">
+      <div class="stat-row" id="statRow">
         <div class="stat">
-          <span class="stat-num" id="livedWeeks">0</span>
-          <span class="stat-label">已活過（週）</span>
+          <span class="stat-num" id="livedCount">0</span>
+          <span class="stat-label" id="livedLabel">已活過</span>
         </div>
         <div class="stat">
-          <span class="stat-num" id="remainWeeks">0</span>
-          <span class="stat-label">還剩約（週）</span>
+          <span class="stat-num" id="remainCount">0</span>
+          <span class="stat-label" id="remainLabel">還剩約</span>
         </div>
         <div class="stat highlight">
           <span class="stat-num" id="lifePct">0%</span>
@@ -68,19 +74,130 @@
       <p class="age-line" id="ageLine"></p>
     </section>
 
+    <section class="panel tick-panel" id="tickPanel" hidden aria-labelledby="tick-title">
+      <h2 id="tick-title" class="section-title">即時計數</h2>
+      <div class="tick-row">
+        <div class="tick-item">
+          <span class="tick-num" id="tickSeconds">0</span>
+          <span class="tick-label">已活過（秒）</span>
+        </div>
+        <div class="tick-item">
+          <span class="tick-num" id="tickMinutes">0</span>
+          <span class="tick-label">已活過（分）</span>
+        </div>
+        <div class="tick-item">
+          <span class="tick-num" id="tickHours">0</span>
+          <span class="tick-label">已活過（時）</span>
+        </div>
+      </div>
+      <div class="progress-list">
+        <div class="progress-item">
+          <div class="progress-meta">
+            <span>今年進度</span>
+            <span id="yearRemainText">—</span>
+          </div>
+          <div class="progress-bar" aria-hidden="true"><i id="yearBar" style="width:0%"></i></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-meta">
+            <span>本月進度</span>
+            <span id="monthRemainText">—</span>
+          </div>
+          <div class="progress-bar" aria-hidden="true"><i id="monthBar" style="width:0%"></i></div>
+        </div>
+        <div class="progress-item">
+          <div class="progress-meta">
+            <span>本週進度</span>
+            <span id="weekRemainText">—</span>
+          </div>
+          <div class="progress-bar" aria-hidden="true"><i id="weekBar" style="width:0%"></i></div>
+        </div>
+      </div>
+    </section>
+
     <section class="panel grid-wrap" id="gridPanel" hidden aria-labelledby="grid-title">
       <div class="grid-head">
-        <h2 id="grid-title">人生週曆</h2>
-        <div class="legend">
+        <h2 id="grid-title">人生格子</h2>
+        <div class="legend" id="gridLegend">
           <span><i class="dot lived"></i>已過</span>
-          <span><i class="dot now"></i>本週</span>
+          <span><i class="dot now"></i>現在</span>
           <span><i class="dot remain"></i>未來</span>
         </div>
       </div>
-      <div class="grid-scroll">
-        <div id="weekGrid" class="week-grid" role="img" aria-label="人生週格圖"></div>
+      <div class="view-tabs" role="tablist" aria-label="檢視單位">
+        <button type="button" class="view-tab" role="tab" data-view="year" aria-selected="false">年</button>
+        <button type="button" class="view-tab" role="tab" data-view="month" aria-selected="false">月</button>
+        <button type="button" class="view-tab is-active" role="tab" data-view="week" aria-selected="true">週</button>
+        <button type="button" class="view-tab" role="tab" data-view="day" aria-selected="false">日</button>
       </div>
-      <p class="grid-foot">每列約一年 · 由左至右 · 由上而下</p>
+      <div class="phase-legend" id="phaseLegend" hidden></div>
+      <div class="grid-scroll">
+        <div id="lifeGrid" class="life-grid view-week" role="img" aria-label="人生格圖"></div>
+      </div>
+      <p class="grid-foot" id="gridFoot">每列約一年 · 由左至右 · 由上而下 · 點格子可看詳情</p>
+      <div class="cell-detail" id="cellDetail" hidden>
+        <div class="cell-detail-head">
+          <strong id="cellDetailTitle">—</strong>
+          <button type="button" id="cellDetailClose" class="text-btn" aria-label="關閉">關閉</button>
+        </div>
+        <p class="cell-detail-range" id="cellDetailRange"></p>
+        <ul class="cell-detail-list" id="cellDetailList"></ul>
+        <p class="cell-detail-note" id="cellDetailNote" hidden></p>
+      </div>
+    </section>
+
+    <section class="panel week-note-panel" id="weekNotePanel" hidden aria-labelledby="week-note-title">
+      <h2 id="week-note-title" class="section-title">這週我要做的一件事</h2>
+      <p class="hint" id="weekNoteRange"></p>
+      <textarea id="weekNote" rows="2" maxlength="120" placeholder="寫下一件這週想完成的小事…"></textarea>
+      <p class="hint">只存在本機。點過去的週格，也能看到當時留下的一句話。</p>
+    </section>
+
+    <section class="panel milestones" id="milestonesPanel" hidden aria-labelledby="milestones-title">
+      <div class="panel-head">
+        <h2 id="milestones-title" class="section-title">人生里程碑</h2>
+        <button type="button" id="addEventBtn" class="chip-btn">＋ 新增</button>
+      </div>
+      <ul class="item-list" id="eventList"></ul>
+      <p class="empty-hint" id="eventEmpty">還沒有里程碑。例如：畢業、結婚、搬家、第一份工作。</p>
+    </section>
+
+    <section class="panel goals" id="goalsPanel" hidden aria-labelledby="goals-title">
+      <div class="panel-head">
+        <h2 id="goals-title" class="section-title">未來目標</h2>
+        <button type="button" id="addGoalBtn" class="chip-btn">＋ 新增</button>
+      </div>
+      <ul class="item-list" id="goalList"></ul>
+      <p class="empty-hint" id="goalEmpty">還沒有目標。例如：30 歲前存到 100 萬、明年跑完半馬。</p>
+    </section>
+
+    <section class="panel phases" id="phasesPanel" hidden aria-labelledby="phases-title">
+      <h2 id="phases-title" class="section-title">人生階段</h2>
+      <p class="hint">格子會依年齡上色。可調整分界歲數。</p>
+      <div class="phase-fields" id="phaseFields">
+        <label class="phase-field">
+          <span class="phase-swatch phase-child"></span>
+          <span>童年 0–</span>
+          <input type="number" id="phaseChildEnd" min="1" max="30" value="12" />
+          <span>歲</span>
+        </label>
+        <label class="phase-field">
+          <span class="phase-swatch phase-school"></span>
+          <span>求學 –</span>
+          <input type="number" id="phaseSchoolEnd" min="10" max="40" value="22" />
+          <span>歲</span>
+        </label>
+        <label class="phase-field">
+          <span class="phase-swatch phase-work"></span>
+          <span>工作 –</span>
+          <input type="number" id="phaseWorkEnd" min="30" max="80" value="65" />
+          <span>歲</span>
+        </label>
+        <label class="phase-field">
+          <span class="phase-swatch phase-retire"></span>
+          <span>退休 ～ 壽命</span>
+        </label>
+      </div>
     </section>
 
     <section class="panel remains" id="remainsPanel" hidden aria-labelledby="remains-title">
@@ -102,6 +219,14 @@
     </section>
 
     <section class="panel share-panel" id="sharePanel" hidden>
+      <div class="share-view-pick">
+        <span class="label">分享圖使用的格子</span>
+        <div class="view-tabs compact" role="group" aria-label="分享圖視圖">
+          <button type="button" class="view-tab share-view" data-share-view="year">年</button>
+          <button type="button" class="view-tab share-view" data-share-view="month">月</button>
+          <button type="button" class="view-tab share-view is-active" data-share-view="week">週</button>
+        </div>
+      </div>
       <button type="button" id="shareBtn" class="primary-btn">產生分享圖</button>
       <p class="hint center">1080×1350，適合貼 IG／Threads。圖檔只在你裝置產生，不會上傳。</p>
       <div id="sharePreview" class="share-preview" hidden>
@@ -115,6 +240,66 @@
       <p class="foot-brand">存點日子</p>
     </footer>
   </main>
+
+  <!-- Event modal -->
+  <dialog id="eventDialog" class="modal">
+    <form method="dialog" id="eventForm" class="modal-card">
+      <h3 id="eventDialogTitle">新增里程碑</h3>
+      <label class="field">
+        <span class="label">日期</span>
+        <input type="date" id="eventDate" required />
+      </label>
+      <label class="field">
+        <span class="label">標題</span>
+        <input type="text" id="eventTitle" maxlength="40" required placeholder="畢業、結婚、搬家…" />
+      </label>
+      <label class="field">
+        <span class="label">表情符號</span>
+        <input type="text" id="eventEmoji" maxlength="4" placeholder="🎓" />
+      </label>
+      <input type="hidden" id="eventEditId" value="" />
+      <div class="modal-actions">
+        <button type="button" id="eventCancel" class="secondary-btn">取消</button>
+        <button type="submit" class="primary-btn">儲存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Goal modal -->
+  <dialog id="goalDialog" class="modal">
+    <form method="dialog" id="goalForm" class="modal-card">
+      <h3 id="goalDialogTitle">新增目標</h3>
+      <label class="field">
+        <span class="label">目標日期</span>
+        <input type="date" id="goalDate" required />
+      </label>
+      <label class="field">
+        <span class="label">標題</span>
+        <input type="text" id="goalTitle" maxlength="40" required placeholder="30 歲前存到 100 萬" />
+      </label>
+      <input type="hidden" id="goalEditId" value="" />
+      <div class="modal-actions">
+        <button type="button" id="goalCancel" class="secondary-btn">取消</button>
+        <button type="submit" class="primary-btn">儲存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <!-- Data modal -->
+  <dialog id="dataDialog" class="modal">
+    <div class="modal-card">
+      <h3>備份與還原</h3>
+      <p class="hint">匯出成 JSON 檔，換裝置時再匯入。資料只在你本機。</p>
+      <div class="modal-actions stack">
+        <button type="button" id="exportBtn" class="primary-btn">匯出 JSON</button>
+        <label class="secondary-btn file-btn">
+          匯入 JSON
+          <input type="file" id="importFile" accept="application/json,.json" hidden />
+        </label>
+        <button type="button" id="dataClose" class="text-btn">關閉</button>
+      </div>
+    </div>
+  </dialog>
 
   <script src="app.js"></script>
 </body>
